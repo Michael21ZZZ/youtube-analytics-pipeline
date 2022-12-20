@@ -12,12 +12,14 @@ import pickle
 import isodate
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
-from get_acc_tag import get_accreditation_tag
+#from get_acc_tag import get_accreditation_tag
 from datetime import datetime
 import re
 import json
 from cleantext import clean
 import pandas as pd
+from bs4 import BeautifulSoup as bs
+from requests_html import HTMLSession
 
 def youtube_authenticate(client_secrets_file):
     os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
@@ -190,6 +192,31 @@ def filter(video_id):
         flag = False
 
     return flag
+
+#get accreditation tag from a single video id
+def get_accreditation_tag(videoID):
+    try:
+        search_url = "https://www.youtube.com/watch?v="
+        video_url = search_url + videoID
+        # print('\n')
+        print("Retrieving accTag for: ", video_url)
+        # init an HTML Session
+        session = HTMLSession()
+        # get the html content
+        response = session.get(video_url)
+        response.html.render(scrolldown = 4, sleep=1, timeout=60)
+        # create bs object to parse HTML
+        soup = bs(response.html.html, "html.parser")
+        acc_tag_text = soup.find_all("div", {"class":"content style-scope ytd-info-panel-content-renderer"})
+        if(len(acc_tag_text) > 0):
+            acc_tag = 1
+        else:
+            acc_tag = 0
+    except:
+        print('error in extracting accTag')
+        acc_tag = 0
+
+    return acc_tag
 
 def metadata_extraction(youtube, keyword, video_id, rank):
     print("extracting the keyword: ", keyword)

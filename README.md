@@ -3,24 +3,39 @@
 ## Project Introduction
 Scripts for YouTube video downloading. 
 
-## Metadata Extraction
+### Metadata Extraction
 Data pipeline to search youtube videos based on clinical keywords and extract video metadata.
 
-## Content Analysis
+#### Acc tag
+This function extracts the accreditation tag of youtube videos. The accreditation tag is a new feature on YouTube that verifies authoritative sources for health related videos. You may find the details here:
+https://support.google.com/youtube/answer/9795167
+
+### Content Analysis
 Transfer videos and metadata into features.
 
-## Classification Model
+### Classification Model
 Models to classifiy videos based on high/low understandability and high/low medical information.
 
-# Authenticiate
+## Authenticiate
 There are multiple authentication that requires manual setup.
 
-## PyTrends
+### PyTrends
 Google trends.
 Error handling:
 1. https://stackoverflow.com/questions/50571317/pytrends-the-request-failed-google-returned-a-response-with-code-429
 
-## search id based on keywords
-Google developer console needed. require API key.
-One account per day: search 91 keywords.
-Asked to increase quota.
+## search video id based on keywords
+You need the Google Developer API to conduct this search. 
+One account per day: search 91 keywords. Asked to increase quota.
+#DEVELOPER_KEY = "AIzaSyANdt1eW-eYygBWMa73vtjX9G2XlvkIdAg" # original API KEY for project
+#DEVELOPER_KEY = "AIzaSyBxztRZEw8u6EjuMgV77dBS1Soel5bOXnk" # Key for Ruoyu Zhang
+
+### extract metadata based on video id
+You need to put your credential for OAuth2.0 Client IDs.  
+credentials_official.json: related to ytbvideoanalytics2022@gmail.com, PW: CMU15213!
+
+### download videos to local
+You need to include API key. 
+
+### upload videos to cloud
+You need include the credential for OAuth2.0 Client IDs. Besides, you need to create a bucket for uploading.
