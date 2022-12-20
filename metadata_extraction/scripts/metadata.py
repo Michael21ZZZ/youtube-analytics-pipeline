@@ -240,26 +240,9 @@ def metadata_extraction(youtube, keyword, video_id, rank):
 
 
 if __name__ == '__main__':
-    # authenticate to YouTube API
     SCOPES = ["https://www.googleapis.com/auth/youtube.force-ssl"]
-    # youtube = youtube_authenticate('./credential_and_key/new_credential.json')
     youtube = youtube_authenticate('./credential_and_key/credentials.json')
-    #youtube = youtube_authenticate('./credential_and_key/credentials_official.json')
-    # df = pd.read_csv('./temp/videoIDs_complete.csv')
-    # # filter based on language and duration
-    # df['Filtered'] = df.apply(lambda row: filter(row.id), axis = 1)
-    # df1 = df[df['Filtered'] == True]
-    # # sampling from each keyword
-    # df2 = df1.groupby('keyword').apply(lambda s: s.sample(min(len(s), 2)))
-    # # select the column and save the result
-    # videoIDs = df2.loc[:,['keyword','id','rank']]
-    # videoIDs.reset_index(drop=True, inplace=True)
-    # # save the result
-    # videoIDs.to_csv('./temp/filtered.csv', index=False)
-    # # load from temp file
     videoIDs = pd.read_csv('./temp/filtered_four_per_keyword.csv')
-    # clear current file    
-    #f = open('./temp/complete_data.txt','w')
     f = open('./temp/complete_data.txt','a')
     # write metadata into complete_data.txt
     for i in range(videoIDs.shape[0]):
