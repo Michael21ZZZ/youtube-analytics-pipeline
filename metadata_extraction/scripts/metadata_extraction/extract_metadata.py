@@ -255,10 +255,10 @@ def metadata_extraction(youtube, keyword, video_id, rank):
 if __name__ == '__main__':
     SCOPES = ["https://www.googleapis.com/auth/youtube.force-ssl"]
     youtube = youtube_authenticate('./credential_and_key/credential.json')
-    videoIDs = pd.read_csv('./temp/sampled_filtered_video_list copy.csv')
+    videoIDs = pd.read_csv('./temp/sampled_filtered_video_list.csv')
     acc_channel_list = []
     noacc_channel_list = []
-    f = open('./temp/final_data_1.json','w')
+    f = open('./output/final_data.json','w')
     for i in range(videoIDs.shape[0]):
         keyword = videoIDs.loc[i, 'keyword']
         video_id = videoIDs.loc[i, 'id']
