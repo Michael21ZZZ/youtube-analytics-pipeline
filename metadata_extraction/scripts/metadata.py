@@ -173,26 +173,6 @@ def extract_comments(youtube, **kwargs):
     #return clean_comments
     return len(comments_list)
 
-# filter based on duration and default language
-def filter(video_id):
-    try:
-        #print("trying ", video_id)
-        video_response = get_video_details(youtube, id=video_id)
-        items = video_response.get("items")[0]
-        content_details = items["contentDetails"]
-        snippet         = items["snippet"]
-        duration = isodate.parse_duration(content_details["duration"]).total_seconds()
-        try:
-            default_language = snippet["defaultLanguage"]
-        except:
-            default_language = 'en'
-        flag = (duration < 361) and (duration >= 59) and (default_language == 'en')
-    except:
-        #print(video_id, " not working")
-        flag = False
-
-    return flag
-
 #get accreditation tag from a single video id
 def get_accreditation_tag(videoID):
     try:
