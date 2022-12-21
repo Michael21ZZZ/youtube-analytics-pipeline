@@ -19,6 +19,9 @@ Models to classifiy videos based on high/low understandability and high/low medi
 ## Authenticiate
 There are multiple authentication that requires manual setup.
 
+### Account use
+The Google account for this project is ytbvideoanalytics2022@gmail.com. The password is CMU15213!. 
+
 ### PyTrends
 Google trends.
 Error handling:
@@ -33,8 +36,6 @@ One account per day: search 91 keywords. Asked to increase quota.
 ### extract metadata based on video id
 You need to put your credential for OAuth2.0 Client IDs. Download the credentials from the portal to credentials_and_keys folder and name it 'credential.json'. Remember to delete token.pickle file before you build a new connection. If you don't, it would cause an [invalid grant error](https://stackoverflow.com/questions/10576386/invalid-grant-trying-to-get-oauth-token-from-google)
 
-ytbvideoanalytics2022@gmail.com, 
-PW: CMU15213!
 
 If you 
 
