@@ -174,12 +174,17 @@ def extract_comments(youtube, **kwargs):
     return len(comments_list)
 
 #get accreditation tag from a single video id
-def get_accreditation_tag(videoID):
+def get_accreditation_tag(videoID, channel_id):
     try:
         search_url = "https://www.youtube.com/watch?v="
         video_url = search_url + videoID
-        # print('\n')
         print("Retrieving accTag for: ", video_url)
+        #if the video belongs to a verified channel, return 1
+        if (channel_id in acc_channel_list):
+            return 1
+        #if the video belongs to a non-verified channel, return 0
+        if (channel_id in noacc_channel_list):
+            return 0
         # init an HTML Session
         session = HTMLSession()
         # get the html content
@@ -190,8 +195,10 @@ def get_accreditation_tag(videoID):
         acc_tag_text = soup.find_all("div", {"class":"content style-scope ytd-info-panel-content-renderer"})
         if(len(acc_tag_text) > 0):
             acc_tag = 1
+            acc_channel_list.append(channel_id)
         else:
             acc_tag = 0
+            noacc_channel_list.append(channel_id)
     except:
         print('error in extracting accTag')
         acc_tag = 0
@@ -202,22 +209,20 @@ def metadata_extraction(youtube, keyword, video_id, rank):
     print("extracting the keyword: ", keyword)
     print("extracting the rank: ", rank)
     result = {}
-    # make API call to get video info
-    video_response = get_video_details(youtube, id=video_id)    
-    items = video_response.get("items")[0]
-    # get the snippet, statistics & content details from the video response
-    snippet         = items["snippet"]
-    video_statistics      = items["statistics"]
-    content_details = items["contentDetails"]
-    channel_id = snippet["channelId"]
-    # get channel info
-    channel_response = get_channel_details(youtube, id=channel_id)
+    # make API call to get video and channel information
+    try:
+        video_response = get_video_details(youtube, id=video_id)
+        items = video_response.get("items")[0]
+        snippet = items["snippet"]
+        video_statistics = items["statistics"]
+        content_details = items["contentDetails"]
+        channel_id = snippet["channelId"]
+        channel_response = get_channel_details(youtube, id=channel_id)   
+    except:
+        print("Failed to extract the videos! The video id is: ", video_id)
+        return
     channel_statistics = channel_response["items"][0]["statistics"]
-
-    # filter based on duration and english
     duration = isodate.parse_duration(content_details["duration"]).total_seconds()
-
-    # store features in result
     result["id"] = items["id"]
     result["title"] = snippet["title"]
     result["views"] = video_statistics["viewCount"]
@@ -226,7 +231,7 @@ def metadata_extraction(youtube, keyword, video_id, rank):
     try:
         result["tags"] = snippet['tags']
     except:
-        result["tags"] = 'NA'
+        result["tags"] = None
     try: 
         result["comments"]= extract_comments(youtube, part="snippet, replies", videoId = video_id, textFormat='plainText')
     except:
@@ -234,10 +239,11 @@ def metadata_extraction(youtube, keyword, video_id, rank):
     try:
         result["likes"] = video_statistics["likeCount"]
     except:
-        result["likes"] = 'NA'
-
-    result["channel"] = {'name': snippet["channelTitle"], 'chanenelID': snippet["channelId"], 'subscribers': channel_statistics["subscriberCount"]}
-    result["accreditationTag"] = get_accreditation_tag(video_id)
+        result["likes"] = 0
+    result["channel_name"] = snippet["channelTitle"]
+    result["chanenelID"] = snippet["channelId"]
+    result["channel_subscribers"] = channel_statistics["subscriberCount"]
+    result["accreditationTag"] = get_accreditation_tag(video_id, channel_id)
     result["duration"] = duration
     result["keyword"] = keyword
     result["rank"] = rank
@@ -248,10 +254,11 @@ def metadata_extraction(youtube, keyword, video_id, rank):
 
 if __name__ == '__main__':
     SCOPES = ["https://www.googleapis.com/auth/youtube.force-ssl"]
-    youtube = youtube_authenticate('./credential_and_key/credentials.json')
-    videoIDs = pd.read_csv('./temp/filtered_four_per_keyword.csv')
-    f = open('./temp/complete_data.txt','a')
-    # write metadata into complete_data.txt
+    youtube = youtube_authenticate('./credential_and_key/credential.json')
+    videoIDs = pd.read_csv('./temp/sampled_filtered_video_list.csv')
+    acc_channel_list = []
+    noacc_channel_list = []
+    f = open('./temp/final_data.json','w')
     for i in range(videoIDs.shape[0]):
         keyword = videoIDs.loc[i, 'keyword']
         video_id = videoIDs.loc[i, 'id']
@@ -260,7 +267,8 @@ if __name__ == '__main__':
         f.write(json.dumps(metadata))
         f.write('\n')
     f.close()
+    print(acc_channel_list)
+    print(noacc_channel_list)
 
-# Trial 1: end at "id": "Ud4HuAzHEUc"
 
 

@@ -2,8 +2,8 @@ import sys
 import pandas as pd
 
 from google_trends import get_trends
-import search
-import metadata
+import search_by_keyword
+import extract_metadata
 from merge_input_list import merge_input_list
 
 #Input Setting
