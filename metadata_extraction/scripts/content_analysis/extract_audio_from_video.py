@@ -1,25 +1,23 @@
-import sys
-import os, io
+import os
 from moviepy.editor import VideoFileClip
 
-def extract_audio_from_video(video_num_list, aduio_num_list):
-    for video_num in video_num_list:
-        if 'mp4' in video_num and video_num.split(".")[1] == "mp4":
-            if video_num.split(".")[0] not in audio_num_list:
-                try:
-                    video = VideoFileClip(os.path.join(VIDEO_PATH, video_num))
-                    audio = video.audio
-                    audio_num = video_num.replace('.mp4', '.wav')
-                    audio.write_audiofile(os.path.join(AUDIO_PATH, audio_num))
-                    video.close()
-                    audio.close()
-                except:
-                    print('can not extract from ', video_num)
+def extract_audio_from_video(video_path, audio_path):
+    video_list = os.listdir(video_path)
+    if not os.path.exists(audio_path):
+        os.makedirs(audio_path)
+    for video_name in video_list:
+        try:
+            video = VideoFileClip(os.path.join(video_path, video_name))
+            audio = video.audio
+            audio_name = video_name.replace('.mp4', '.wav')
+            audio.write_audiofile(os.path.join(audio_path, audio_name))
+            video.close()
+            audio.close()
+        except:
+            print('can not extract from ', video_name)
 
-if __name__ == 'main':
+if __name__ == '__main__':
     VIDEO_PATH = "./output/videos"
     AUDIO_PATH = "./output/audios"
-    video_num_list = os.listdir(VIDEO_PATH)
-    audio_num_list = os.listdir(AUDIO_PATH)
-    audio_num_list = [a.split(".")[0] for a in audio_num_list]
-    extract_audio_from_video(video_num_list, audio_num_list)
+    video_list = os.listdir(VIDEO_PATH)
+    extract_audio_from_video(VIDEO_PATH, AUDIO_PATH)

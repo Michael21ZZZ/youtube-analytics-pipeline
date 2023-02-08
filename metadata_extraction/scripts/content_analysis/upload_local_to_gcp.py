@@ -3,10 +3,12 @@ import os
 import argparse
 import pprint
 
-credential_path= "./credential_and_key/credential.json"  # You have to create your own json credential
+credential_path= "/credential_and_key/geometric-rock-358702-c152672f14dc.json"  # You have to create your own json credential
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = os.getcwd() + credential_path
-UP_LOAD_FILE_ROUTE = './videos'
-BUCKET_NAME = 'youtube-video-bucket' # You have to create your bucket and download the bucket name
+# UP_LOAD_FILE_ROUTE = './output/videos'
+# BUCKET_NAME = 'youtube-video-bucket' # You have to create your bucket and download the bucket name
+UP_LOAD_FILE_ROUTE = './output/audios'
+BUCKET_NAME = 'youtube-audio-bucket' # You have to create your bucket and download the bucket name
 
 # upload single file
 def upload_blob(bucket_name, source_file_name, destination_blob_name):
@@ -75,6 +77,6 @@ def bucket_metadata(bucket_name):
     print("Labels:")
     pprint.pprint(bucket.labels)
 
-if __name__ == 'main':
-    upload_blob(BUCKET_NAME, '.videos/0.mp4', '0.mp4')
+if __name__ == '__main__':
+    #upload_blob(BUCKET_NAME, './output/videos/0.mp4', 'videos/0.mp4')
     upload_files(BUCKET_NAME)
