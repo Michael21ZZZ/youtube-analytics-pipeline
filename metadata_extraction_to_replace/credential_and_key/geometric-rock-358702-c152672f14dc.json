@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "geometric-rock-358702",
+  "private_key_id": "c152672f14dcd2fd3ad591decee08d691c165c24",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCvQ8jb2Ki8LA3M\nSthnP1jjypvLbDy0CoNixL7KfFCv2O50hu+kFFj1G0oa+wbtgYxA93DEq+kTVuVX\n8b6aI66pok+Ci9KdJRAEm56U0m8M+kCziOhx1i+mTWDIKhdaZzj6I6U3OO9cMsTe\n9cz9H7YyVp9bzBof87qdUrZjAclhFzDLK9L7xrCFD2kmxYMopAgQdR0Eiv0I7G2w\nunFH5cstlsQ3BMllQdU/FlP9kJrhYTrbzArbUUXr0pjjsBK14lII9zc7g+LLABo9\nnPB8X6wj73TPfhg+IklWG3V3pZpLXO9uKgUpULXOoDDblhqjHhAx4uIcaPSqyRBX\ni5cvgk4VAgMBAAECggEAAIg9KOW8hW3A0Pj9NTsNAwwPcwuuF4HcqkUcqzK7b/1B\npBrwyVfCeWQO0owmljwJd/0IW6CGAagG5EB4qrEnC57RjPzts8p0BP+P+LW23pw3\n7BOjWQ0kceXUQGdYUM71blUDYGqM14PT8zVd3Prmq7p1m2rAPY6Y53dj1GMiAGh3\nVKfBUtgtF1WXCa737mPNfjbWGpy2POUEDaDVP8oMr4rswso+ecKuREXHvLyDuSjo\nFmHN4pA6Wz+S/k0fW1fVoO/H7uZ1isZj5ds28x60QxjRimpHDytziJI3AjKy2Ow9\nUqvaTdqqRphtZBQ7NNDYmf7aubb2o/5T1H5M99CAtQKBgQDfvgrJxcNS1fLuG4jW\nc3VvxD315fT+wOmTgy8a9nBFEzlTpmOrsPpdD6VIS3vxf81uWsIMETMqH0ofgBMO\nJ6VymnYbWrJ1W+2IHk8KRz4PhySgi4wYbhUSJeHKVpW0cmyepmdGfDxlbxZXkB8w\nHHbW1Zk4F3JVWsDYT86Fh6hAiwKBgQDIiIQeTxlRcw8jNvez9yHhmkObm5tU+n+0\nCvT7d6rxZsP2uICdDiDXcP1BD6qVN5npuH63kBU06jXU4tIzjf3fueB46VGAbd+I\nzNPwEY53j9MDkBQfZehKdLraMimRbg2WXMLGxY+k8UmLdR3JBKf5Phz/em3NrfuU\n4kONAUvf3wKBgQCJw7lezc9b1PK02+1gpkz8GahRHVvB9MSdmJvLjUxJq/GTaRNb\n5yfxXy3VGu1hIOE7/tQWnAyV9hgs1y5ke9LqguMQKsNRcd4K/yaJ3J4A76SE2gfU\nDwwYVYz2imO5bO8mrK1QgDSr/D+UgOBDPnOKCpFCMWWr2qp9Rn6SR5o4ywKBgQCJ\nikjD2RDOcpJRXuQqRTix2fLBCctST7XDMTiyOXO/uvJxiD5+ejBAVDj/pNUlH0ur\nqGURVfuVnYZqi2ANCDi2eHDjvXOvGK0W0RYUNJZ4nubmLK4Akw7t8n4uJfWoz8j1\n9o2Jc/t/8Ba3Vg6lz1G+e8G74KbrSYeiqEYYsmjuFQKBgG9qE07Q1TGvrGra2PSE\nrqRANuZBJOeO1T8mA1V0xScy/Py9ZXKGZl0NFtx54fxUJr1dSC4o7Nm860VD4HyB\nbzNAeNnfP/PjCDtaZfeGCFI1vmg0y8DWFxjwXZc37v1veRXQT3z8ffYYGjVVmPF8\nwPFGQYDzi0Oms4KeRPqSvQCW\n-----END PRIVATE KEY-----\n",
+  "client_email": "ruoyu-service-account@geometric-rock-358702.iam.gserviceaccount.com",
+  "client_id": "109011938776426045188",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/ruoyu-service-account%40geometric-rock-358702.iam.gserviceaccount.com"
+}
