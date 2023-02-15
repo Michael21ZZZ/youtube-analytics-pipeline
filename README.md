@@ -1,5 +1,8 @@
 # Youtube Video Metadata Extraction Pipeline
 
+## Overall Pipeline
+![Data Pipeline](https://user-images.githubusercontent.com/91205016/218861007-9bbc343a-af1a-4411-95b3-4bd0308fe9f7.jpg)
+
 ## Project Introduction
 Scripts for YouTube video downloading. 
 
