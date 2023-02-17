@@ -4,6 +4,8 @@ import json
 credential_path= "/credential_and_key/geometric-rock-358702-c152672f14dc.json"  # You have to create your own json credential
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = os.getcwd() + credential_path
 BUCKET_NAME = 'youtube-audio-bucket' # You have to create your bucket and download the bucket name
+LOCAL_VIDEO_PATH = "temp/videos"
+LOCAL_AUDIO_PATH = "temp/audios"
 
 
 # [START speech_transcribe_sync_gcs]

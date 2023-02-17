@@ -64,7 +64,7 @@ def write_keyword_and_id(keyword_list, video_per_keyword):
     result_no_duplicate = result.drop_duplicates(subset="id", keep="last")
     
     return result_no_duplicate
-    
+
 if __name__ == '__main__':
     keyword_list = ['Diabete', 'Causes']
     print(write_keyword_and_id(keyword_list, 2))

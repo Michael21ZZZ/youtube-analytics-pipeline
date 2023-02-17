@@ -1,8 +1,8 @@
 from google.cloud import videointelligence
 import os
 import json
-credential_path= "/credential_and_key/geometric-rock-358702-c152672f14dc.json"  # You have to create your own json credential
-os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = os.getcwd() + credential_path
+# credential_path= "/credential_and_key/geometric-rock-358702-c152672f14dc.json"  # You have to create your own json credential
+# os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = os.getcwd() + credential_path
 
 # the number of shot changes is extracted via ShotChangeDetection
 def analyze_shots(path):
@@ -75,14 +75,19 @@ def text_detection(path):
     
     return confidence / num_of_texts
         
-
-if __name__ == "__main__":
-    path = "gs://youtube-video-bucket/0.mp4"
+def analyze_by_path(path):
     dict_video = {}
     dict_video['num_of_shots'] = analyze_shots(path)
     dict_video['num_of_objects'] = analyze_objects(path)
     dict_video['text_confidence'] = text_detection(path)
-    with open('./temp/video_feature.json', "w") as f:
-        json.dump(dict_video, f)
-        f.write('\n')
-    f.close()
+    
+    return dict_video
+    
+    
+if __name__ == "__main__":
+    path = "gs://youtube-video-bucket/0.mp4"
+    print(analyze_by_path(path))
+    # with open('./temp/video_feature.json', "w") as f:
+    #     json.dump(dict_video, f)
+    #     f.write('\n')
+    # f.close()

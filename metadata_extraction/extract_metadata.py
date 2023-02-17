@@ -20,7 +20,7 @@ from cleantext import clean
 import pandas as pd
 from bs4 import BeautifulSoup as bs
 from requests_html import HTMLSession
-import datetime
+
 
 def youtube_authenticate(client_secrets_file):
     SCOPES = ["https://www.googleapis.com/auth/youtube.force-ssl"]
@@ -207,10 +207,9 @@ def get_accreditation_tag(videoID, channel_id):
 
     return acc_tag
 
-def metadata_extraction(youtube, video_id, keyword):
-    print("extracting the keyword: ", keyword)
+def metadata_extraction(youtube, video_id):
+    print("extracting the id: ", video_id)
     result = {}
-    text_result = {}
     # make API call to get video and channel information
     try:
         video_response = get_video_details(youtube, id=video_id)
@@ -230,8 +229,6 @@ def metadata_extraction(youtube, video_id, keyword):
     # restore video metadata information
     # id
     result["id"] = items["id"]
-    # keyword
-    result["keyword"] = keyword
     # hasTitle, 0/1, all videos must have title
     # result["hasTitle"] = 1 if len(snippet["title"]) != 0 else 0
     # titleLength, integer
@@ -256,20 +253,23 @@ def metadata_extraction(youtube, video_id, keyword):
     result["accreditationTag"] = get_accreditation_tag(video_id, channel_id)
     # duration, integer
     result["duration"] = duration
+    # description, text
+    result["description"] = description
     # publish_days, integer
     current_date = '2023-02-15'
+    from datetime import datetime
     result['publish_days'] = (datetime.strptime(current_date, "%Y-%m-%d") - datetime.strptime(snippet["publishedAt"][0:10], "%Y-%m-%d")).days
-    # keyword - description
-    result["cos_desc"] = calc_cosine_similarity(str(keyword), description)
-    # keyword - tag + title
-    result["cos_title"] = calc_cosine_similarity(str(keyword), str(snippet["title"] + snippet['tags'].join('')))
+    # # keyword - description
+    # result["cos_desc"] = calc_cosine_similarity(str(keyword), description)
+    # # keyword - tag + title
+    # result["cos_title"] = calc_cosine_similarity(str(keyword), str(snippet["title"] + snippet['tags'].join('')))
     
     # restore text result for future development
     # id
-    text_result["id"] = items["id"]
+    # text_result["id"] = items["id"]
     # keyword
-    text_result["keyword"] = keyword
-    text_result["description"] = description
+    # text_result["keyword"] = keyword
+    # text_result["description"] = description
     # result["title"] = snippet["title"]
     # result["views"] = video_statistics["viewCount"]
     # result["date_published"] = snippet["publishedAt"][0:10]
@@ -295,7 +295,7 @@ def metadata_extraction(youtube, video_id, keyword):
     # result["rank"] = rank
     # result["consine similarity"] = calc_cosine_similarity(str(keyword), result["description"])
 
-    return result, text_result
+    return result
 
 
 if __name__ == '__main__':
@@ -314,6 +314,7 @@ if __name__ == '__main__':
         m.write('\n')
         t.write(json.dumps(text_feature))
         t.write('\n')
+        # break
     m.close()
     t.close()
     # print(acc_channel_list)
