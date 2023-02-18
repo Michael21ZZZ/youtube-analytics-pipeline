@@ -1,8 +1,6 @@
 from google.cloud import videointelligence
 import os
 import json
-# credential_path= "/credential_and_key/geometric-rock-358702-c152672f14dc.json"  # You have to create your own json credential
-# os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = os.getcwd() + credential_path
 
 # the number of shot changes is extracted via ShotChangeDetection
 def analyze_shots(path):
@@ -18,19 +16,8 @@ def analyze_shots(path):
     print("\nFinished processing.")
     
     num_shots = sum(1 for _ in result.annotation_results[0].shot_annotations)
-    
-    # for i, shot in enumerate(result.annotation_results[0].shot_annotations):
-    #     start_time = (
-    #         shot.start_time_offset.seconds + shot.start_time_offset.microseconds / 1e6
-    #     )
-    #     end_time = (
-    #         shot.end_time_offset.seconds + shot.end_time_offset.microseconds / 1e6
-    #     )
-    #     print("\tShot {}: {} to {}".format(i, start_time, end_time))
-    
+     
     return num_shots
-
-
 
 
 # number of unique objects is extracted from ObjectTracking
@@ -51,8 +38,6 @@ def analyze_objects(path):
     
     return num_of_objects
     
-    
-
 # text detection confidence is extracted from TextDetection
 def text_detection(path):
     video_client = videointelligence.VideoIntelligenceServiceClient()
@@ -77,12 +62,12 @@ def text_detection(path):
         
 def analyze_by_path(path):
     dict_video = {}
+    dict_video['id'] = os.path.basename(path)
     dict_video['num_of_shots'] = analyze_shots(path)
     dict_video['num_of_objects'] = analyze_objects(path)
     dict_video['text_confidence'] = text_detection(path)
     
     return dict_video
-    
     
 if __name__ == "__main__":
     path = "gs://youtube-video-bucket/0.mp4"

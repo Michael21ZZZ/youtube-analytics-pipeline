@@ -1,16 +1,31 @@
+'''
+Download the video, Extract audio, and Upload the video and audio to GCP
+'''
 from google.cloud import storage,speech
 import os
 import json
-credential_path= "/credential_and_key/geometric-rock-358702-c152672f14dc.json"  # You have to create your own json credential
-os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = os.getcwd() + credential_path
-BUCKET_NAME = 'youtube-audio-bucket' # You have to create your bucket and download the bucket name
-LOCAL_VIDEO_PATH = "temp/videos"
-LOCAL_AUDIO_PATH = "temp/audios"
+import os
+from moviepy.editor import VideoFileClip
+from google.cloud import storage
+import os
+import argparse
+import pprint
+from pytube import YouTube
+import pandas as pd
 
+# credential_path= "/credential_and_key/geometric-rock-358702-c152672f14dc.json"  # You have to create your own json credential
+# os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = os.getcwd() + credential_path
+# BUCKET_NAME = 'youtube-audio-bucket' # You have to create your bucket and download the bucket name
+# LOCAL_VIDEO_PATH = "temp/videos"
+# LOCAL_AUDIO_PATH = "temp/audios"
 
-# [START speech_transcribe_sync_gcs]
+# transcribe on gcp
 def transcribe_gcs(gcs_uri):
-    """Transcribes the audio file specified by the gcs_uri."""
+    """
+    Transcribes the audio file specified by the gcs_uri.
+    
+    @param gcs_uri
+    """
     client = speech.SpeechClient()
 
     # [START speech_python_migration_config_gcs]
@@ -40,19 +55,19 @@ def transcribe_gcs(gcs_uri):
         confidence += result.alternatives[0].confidence
         num_result += 1
     avg_confidence = confidence / num_result
-    return transcription, avg_confidence
-        
     
-# [END speech_transcribe_sync_gcs]
-
+    dict_trans = {}
+    dict_trans['id'] = os.path.basename(gcs_uri)
+    dict_trans['transcription'] = transcription
+    dict_trans['transcription confidence'] = avg_confidence
+    
+    return dict_trans
+        
 if __name__ == "__main__":
     path = "gs://youtube-audio-bucket/0.wav"
-    transcription, avg_confidence = transcribe_gcs(path)
-    dict_trans = {}
-    dict_trans['text'] = transcription
-    dict_trans['confidence'] = avg_confidence
-    with open('./output/transcription_feature.json', "w") as f:
-        json.dump(dict_trans, f)
-        f.write('\n')
-    f.close()
+    dict = transcribe_gcs(path)
+    # with open('./output/transcription_feature.json', "w") as f:
+    #     json.dump(dict_trans, f)
+    #     f.write('\n')
+    # f.close()
 

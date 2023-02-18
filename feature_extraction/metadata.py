@@ -232,7 +232,7 @@ def metadata_extraction(youtube, video_id):
     # hasTitle, 0/1, all videos must have title
     # result["hasTitle"] = 1 if len(snippet["title"]) != 0 else 0
     # titleLength, integer
-    result["titleLength"] = len(snippet["title"].split())
+    # result["titleLength"] = len(snippet["title"].split())
     # hasTags. 0/1
     try:
         result["hasTags"] =  1 if len(snippet["tags"]) != 0 else 0
