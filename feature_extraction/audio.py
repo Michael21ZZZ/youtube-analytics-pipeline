@@ -57,7 +57,7 @@ def transcribe_gcs(gcs_uri):
     avg_confidence = confidence / num_result
     
     dict_trans = {}
-    dict_trans['id'] = os.path.basename(gcs_uri)
+    dict_trans['id'] = os.path.basename(gcs_uri).split(".")[0]
     dict_trans['transcription'] = transcription
     dict_trans['transcription confidence'] = avg_confidence
     

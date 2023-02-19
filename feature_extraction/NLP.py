@@ -1,4 +1,23 @@
+'''
+
+!pip install spacy==3.0.5
+!pip install scispacy==0.4.0
+
+## Install scispaCy models
+!pip install https://s3-us-west-2.amazonaws.com/ai2-s2-scispacy/releases/v0.4.0/en_core_sci_sm-0.4.0.tar.gz
+!pip install https://s3-us-west-2.amazonaws.com/ai2-s2-scispacy/releases/v0.4.0/en_ner_craft_md-0.4.0.tar.gz
+!pip install https://s3-us-west-2.amazonaws.com/ai2-s2-scispacy/releases/v0.4.0/en_ner_jnlpba_md-0.4.0.tar.gz
+!pip install https://s3-us-west-2.amazonaws.com/ai2-s2-scispacy/releases/v0.4.0/en_ner_bc5cdr_md-0.4.0.tar.gz # you can only install this package
+!pip install https://s3-us-west-2.amazonaws.com/ai2-s2-scispacy/releases/v0.4.0/en_ner_bionlp13cg_md-0.4.0.tar.gz
+!pip install https://s3-us-west-2.amazonaws.com/ai2-s2-scispacy/releases/v0.4.0/en_core_sci_lg-0.4.0.tar.gz
+'''
+
 import string
+import scispacy
+import spacy
+from sklearn.metrics.pairwise import cosine_similarity
+from sklearn.feature_extraction.text import TfidfVectorizer
+
 SUMMARY_WORD_LIST = ["finally", "in a word", "in brief", "briefly", "in conclusion", "in the end", "in the final analysis", 
 'on the whole', "thus", "to conclude", "to summarize", "in sum", "to sum up", "in summary", "lastly"]
 TRANSITION_WORD_LIST = ['Accordingly', ' as a result', ' and so', ' because', ' consequently', ' for that reason', ' hence', ' on\naccount of', ' since', ' therefore', ' thus', ' after', ' afterwards', ' always', ' at length', ' during', ' earlier', 'following', ' immediately', ' in the meantime', ' later', ' never', ' next', ' once', ' simultaneously', 
@@ -9,42 +28,56 @@ TRANSITION_WORD_LIST = ['Accordingly', ' as a result', ' and so', ' because', ' 
 
 
 # function calculating the similarity of keyword with video description
-def calc_cosine_similarity(word1, word2):
-    # Cosine similarity calculation
-    # tokenization
-    X_list = word_tokenize(word1) 
-    Y_list = word_tokenize(word2)
+# def calc_cosine_similarity(word1, word2):
+#     # Cosine similarity calculation
+#     # tokenization
+#     X_list = word_tokenize(word1) 
+#     Y_list = word_tokenize(word2)
       
-    # sw contains the list of stopwords
-    sw = stopwords.words('english') 
-    l1 =[];l2 =[]
+#     # sw contains the list of stopwords
+#     sw = stopwords.words('english') 
+#     l1 =[];l2 =[]
       
-    # remove stop words from the string
-    X_set = {w for w in X_list if not w in sw} 
-    Y_set = {w for w in Y_list if not w in sw}
+#     # remove stop words from the string
+#     X_set = {w for w in X_list if not w in sw} 
+#     Y_set = {w for w in Y_list if not w in sw}
       
-    # form a set containing keywords of both strings 
-    rvector = X_set.union(Y_set) 
-    for w in rvector:
-        if w in X_set: l1.append(1) # create a vector
-        else: l1.append(0)
-        if w in Y_set: l2.append(1)
-        else: l2.append(0)
-    c = 0
+#     # form a set containing keywords of both strings 
+#     rvector = X_set.union(Y_set) 
+#     for w in rvector:
+#         if w in X_set: l1.append(1) # create a vector
+#         else: l1.append(0)
+#         if w in Y_set: l2.append(1)
+#         else: l2.append(0)
+#     c = 0
       
-    # cosine formula 
-    for i in range(len(rvector)):
-        c+= l1[i]*l2[i]
-    if float((sum(l1)*sum(l2))**0.5) == 0:
-        return "NA"
-    else:
-        return c / float((sum(l1)*sum(l2))**0.5)
+#     # cosine formula 
+#     for i in range(len(rvector)):
+#         c+= l1[i]*l2[i]
+#     if float((sum(l1)*sum(l2))**0.5) == 0:
+#         return "NA"
+#     else:
+#         return c / float((sum(l1)*sum(l2))**0.5)
 
+def calculate_cosine_similarity(text1, text2):
+    # Initialize the vectorizer and transform the texts to vectors
+    vectorizer = TfidfVectorizer()
+    vectors = vectorizer.fit_transform([text1, text2])
+
+    # Calculate the cosine similarity between the vectors
+    similarity = cosine_similarity(vectors[0:1], vectors)[0][1]
+
+    return similarity
+
+# count number of medical entity in given texts
 def medical_entity_count(text):
-    
-    return 0
+    nlp = spacy.load("en_ner_bc5cdr_md")
+    doc = nlp(text)
+    clinical_terms = set([ent.text.lower() for ent in doc.ents if ent.label_ in ['DISEASE', 'CHEMICAL']])
+    return len(clinical_terms)
 
-def count_paragraph_stats(paragraph):
+# count basic statistics of the text
+def count_stats(paragraph):
     # Count the number of letters
     letters = sum(c.isalpha() for c in paragraph)
 
@@ -65,9 +98,6 @@ def count_paragraph_stats(paragraph):
     all_words = paragraph.translate(str.maketrans('', '', string.punctuation)).lower().split()
     summary_words = len([word for word in all_words if word.strip() in SUMMARY_WORD_LIST])
     transition_words = len([word for word in all_words if word.strip() in TRANSITION_WORD_LIST])
-    # word_counts = {word: all_words.count(word) for word in set(all_words) if word not in stop_words}
-    # summary_words = len([word for word, count in sorted(word_counts.items(), key=lambda x: x[1], reverse=True)[:10]])
-    # summary_words = 10
     
     # calculate ARI socre
     letters_per_word = letters / words
@@ -75,3 +105,4 @@ def count_paragraph_stats(paragraph):
     ari_score = 4.71 * letters_per_word + 0.5 * words_per_sent - 21.43
 
     return words, unique_words, sentences, active_words, summary_words, transition_words, ari_score
+

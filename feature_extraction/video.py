@@ -62,7 +62,7 @@ def text_detection(path):
         
 def analyze_by_path(path):
     dict_video = {}
-    dict_video['id'] = os.path.basename(path)
+    dict_video['id'] = os.path.basename(path).split(".")[0]
     dict_video['num_of_shots'] = analyze_shots(path)
     dict_video['num_of_objects'] = analyze_objects(path)
     dict_video['text_confidence'] = text_detection(path)

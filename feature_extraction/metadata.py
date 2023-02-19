@@ -115,38 +115,6 @@ def get_channel_details(youtube, **kwargs):
         **kwargs
     ).execute()
 
-# function calculating the similarity of keyword with video description
-def calc_cosine_similarity(word1, word2):
-    # Cosine similarity calculation
-    # tokenization
-    X_list = word_tokenize(word1) 
-    Y_list = word_tokenize(word2)
-      
-    # sw contains the list of stopwords
-    sw = stopwords.words('english') 
-    l1 =[];l2 =[]
-      
-    # remove stop words from the string
-    X_set = {w for w in X_list if not w in sw} 
-    Y_set = {w for w in Y_list if not w in sw}
-      
-    # form a set containing keywords of both strings 
-    rvector = X_set.union(Y_set) 
-    for w in rvector:
-        if w in X_set: l1.append(1) # create a vector
-        else: l1.append(0)
-        if w in Y_set: l2.append(1)
-        else: l2.append(0)
-    c = 0
-      
-    # cosine formula 
-    for i in range(len(rvector)):
-        c+= l1[i]*l2[i]
-    if float((sum(l1)*sum(l2))**0.5) == 0:
-        return "NA"
-    else:
-        return c / float((sum(l1)*sum(l2))**0.5)
-
 def extract_comments(youtube, **kwargs):
     comments_response = youtube.commentThreads().list(**kwargs).execute()
     comments_list = []
@@ -229,6 +197,7 @@ def metadata_extraction(youtube, video_id):
     # restore video metadata information
     # id
     result["id"] = items["id"]
+    result["title"] = snippet["title"]
     # hasTitle, 0/1, all videos must have title
     # result["hasTitle"] = 1 if len(snippet["title"]) != 0 else 0
     # titleLength, integer
