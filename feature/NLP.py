@@ -17,6 +17,9 @@ import scispacy
 import spacy
 from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.feature_extraction.text import TfidfVectorizer
+import nltk
+from nltk.tokenize import word_tokenize
+from nltk import pos_tag
 
 SUMMARY_WORD_LIST = ["finally", "in a word", "in brief", "briefly", "in conclusion", "in the end", "in the final analysis", 
 'on the whole', "thus", "to conclude", "to summarize", "in sum", "to sum up", "in summary", "lastly"]
@@ -90,10 +93,24 @@ def count_stats(paragraph):
     # Count the number of sentences
     sentences = paragraph.count('.') + paragraph.count('!') + paragraph.count('?')
 
-    # Count the number of "active" words (defined as words not in a list of stop words)
-    stop_words = set(['a', 'an', 'and', 'the', 'is', 'of', 'to', 'that', 'this', 'in', 'for', 'with', 'on', 'at', 'from'])
-    active_words = sum(1 for word in paragraph.translate(str.maketrans('', '', string.punctuation)).lower().split() if word not in stop_words)
+    # # Count the number of "active" words (defined as words not in a list of stop words)
+    # stop_words = set(['a', 'an', 'and', 'the', 'is', 'of', 'to', 'that', 'this', 'in', 'for', 'with', 'on', 'at', 'from'])
+    # active_words = sum(1 for word in paragraph.translate(str.maketrans('', '', string.punctuation)).lower().split() if word not in stop_words)
 
+    # count active words
+    # Tokenize the sentence into words
+    token_words = word_tokenize(paragraph)
+
+    # Tag the words with their POS
+    pos_tags = pos_tag(token_words)
+
+    # Filter the tagged words to keep only active verbs
+    active_verbs = [word for word, tag in pos_tags if tag.startswith('VB') and 'VBG' not in tag and 'VBN' not in tag]
+    
+    # count number of active verbs
+    active_words = len(active_verbs)
+    
+    
     # Count the number of "summary" words (defined as the 10 most frequent non-stop words)
     all_words = paragraph.translate(str.maketrans('', '', string.punctuation)).lower().split()
     summary_words = len([word for word in all_words if word.strip() in SUMMARY_WORD_LIST])
