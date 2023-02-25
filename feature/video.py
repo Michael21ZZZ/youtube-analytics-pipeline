@@ -10,10 +10,10 @@ def analyze_shots(path):
     operation = video_client.annotate_video(
         request={"features": features, "input_uri": path}
     )
-    print("\nProcessing video for shot change annotations:")
+    print("Processing video for shot change annotations:")
 
     result = operation.result(timeout=120)
-    print("\nFinished processing.")
+    print("Finished processing.")
     
     num_shots = sum(1 for _ in result.annotation_results[0].shot_annotations)
      
@@ -27,10 +27,10 @@ def analyze_objects(path):
     operation = video_client.annotate_video(
         request={"features": features, "input_uri": path}
     )
-    print("\nProcessing video for object annotations.")
+    print("Processing video for object annotations.")
 
     result = operation.result(timeout=500)
-    print("\nFinished processing.\n")
+    print("Finished processing.\n")
     
     # The first result is retrieved because a single video was processed.
     object_annotations = result.annotation_results[0].object_annotations
@@ -45,7 +45,7 @@ def text_detection(path):
     
     operation = video_client.annotate_video(request={"features": features, "input_uri": path})
 
-    print("\nProcessing video for text detection.")
+    print("Processing video for text detection.")
     result = operation.result(timeout=600)
 
     # The first result is retrieved because a single video was processed.

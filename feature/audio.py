@@ -33,7 +33,7 @@ def transcribe_gcs(gcs_uri):
     # [END speech_python_migration_config_gcs]
     operation = client.long_running_recognize(config=config, audio=audio)
 
-    print("Waiting for operation to complete...")
+    # print("Waiting for operation to complete...")
     response = operation.result(timeout=180) # timeout
     
     # Each result is for a consecutive portion of the audio. Iterate through
@@ -43,8 +43,8 @@ def transcribe_gcs(gcs_uri):
     num_result = 0
     for result in response.results:
         # The first alternative is the most likely one for this portion.
-        print("Transcript: {}".format(result.alternatives[0].transcript))
-        print("Confidence: {}".format(result.alternatives[0].confidence))
+        # print("Transcript: {}".format(result.alternatives[0].transcript))
+        # print("Confidence: {}".format(result.alternatives[0].confidence))
         transcription += result.alternatives[0].transcript
         confidence += result.alternatives[0].confidence
         num_result += 1

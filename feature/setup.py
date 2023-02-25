@@ -17,6 +17,10 @@ import os
 import argparse
 import pprint
 
+class SetupError(Exception):
+    def __init__(self, message):
+        self.message = message
+        
 def download_video_by_id(video_id, save_path):
     video_url = 'https://www.youtube.com/watch?v=' + video_id
     file_name = str(video_id) + '.mp4'
@@ -83,11 +87,11 @@ def upload_blob(bucket_name, source_file_name, destination_blob_name):
 
     blob.upload_from_filename(source_file_name)
 
-    print(
-        "File {} uploaded to {}.".format(
-            source_file_name, destination_blob_name
-        )
-    )
+    # print(
+    #     "File {} uploaded to {}.".format(
+    #         source_file_name, destination_blob_name
+    #     )
+    # )
     
 #upload multiple file
 def upload_files(bucket_name, source_file_route):
@@ -100,11 +104,11 @@ def upload_files(bucket_name, source_file_route):
         file_route = os.path.join(source_file_route, file)
         blob = bucket.blob(file)
         blob.upload_from_filename(file_route)
-        print(
-            "File {} uploaded to {}.".format(
-                file_route, bucket_name
-            )
-        )
+        # print(
+        #     "File {} uploaded to {}.".format(
+        #         file_route, bucket_name
+        #     )
+        # )
 
 # get bucket metadata
 def bucket_metadata(bucket_name):
@@ -144,22 +148,28 @@ def pipeline_setup(video_id):
     local_video_path = os.path.join(os.environ.get("LOCAL_VIDEO_ROOT_PATH"), video_id +".mp4")
     local_audio_path = os.path.join(os.environ.get("LOCAL_AUDIO_ROOT_PATH"), video_id +".wav")
     
-    print("SETTING UP PIPELINE!")
+    print("\nSETTING UP PIPELINE for ", video_id)
     
-    # download video to local 
-    download_video_by_id(video_id, os.environ.get("LOCAL_VIDEO_ROOT_PATH"))
+    try: 
+        # download video to local 
+        # no need to download for amia project
+        download_video_by_id(video_id, os.environ.get("LOCAL_VIDEO_ROOT_PATH"))
 
-    # extract audio from video
-    # extract_audios_from_videos(os.environ.get("LOCAL_VIDEO_PATH"), os.environ.get("LOCAL_AUDIO_PATH"))
-    extract_single_audio(local_video_path, local_audio_path)
+        # extract audio from video
+        # extract_audios_from_videos(os.environ.get("LOCAL_VIDEO_PATH"), os.environ.get("LOCAL_AUDIO_PATH"))
+        extract_single_audio(local_video_path, local_audio_path)
 
-    # upload video to GCP for video analysis
-    # upload_files(os.environ.get("VIDEO_BUCKET_NAME"), os.environ.get("LOCAL_AUDIO_PATH"))
-    upload_blob(os.environ.get("VIDEO_BUCKET_NAME"), local_video_path, video_id +".mp4")
+        # upload video to GCP for video analysis
+        # upload_files(os.environ.get("VIDEO_BUCKET_NAME"), os.environ.get("LOCAL_AUDIO_PATH"))
+        # no need to upload videos for amia project
+        upload_blob(os.environ.get("VIDEO_BUCKET_NAME"), local_video_path, video_id +".mp4")
 
-    # upload audio to GCP for transcription analysis
-    # upload_files(os.environ.get("AUDIO_BUCKET_NAME"), os.environ.get("LOCAL_AUDIO_PATH"))
-    upload_blob(os.environ.get("AUDIO_BUCKET_NAME"), local_audio_path, video_id +".wav")
+        # upload audio to GCP for transcription analysis
+        # upload_files(os.environ.get("AUDIO_BUCKET_NAME"), os.environ.get("LOCAL_AUDIO_PATH"))
+        upload_blob(os.environ.get("AUDIO_BUCKET_NAME"), local_audio_path, video_id +".wav")
+    
+    except:
+        raise SetupError('HAVING TROBULE SETTING UP PIPELINE FOR: '+video_id)
 
 if __name__ == 'main':
     extract_single_audio("temp/KLoaYPXlWHM.mp4", "temp")

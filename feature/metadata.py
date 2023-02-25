@@ -149,7 +149,7 @@ def get_accreditation_tag(videoID, channel_id):
     try:
         search_url = "https://www.youtube.com/watch?v="
         video_url = search_url + videoID
-        print("Retrieving accTag for: ", video_url)
+        # print("Retrieving accTag for: ", video_url)
         #if the video belongs to a verified channel, return 1
         if (channel_id in acc_channel_list):
             return 1
@@ -171,13 +171,12 @@ def get_accreditation_tag(videoID, channel_id):
             acc_tag = 0
             noacc_channel_list.append(channel_id)
     except:
-        print('error in extracting accTag')
+        # print('error in extracting accTag')
         acc_tag = 0
 
     return acc_tag
 
 def metadata_extraction(youtube, video_id):
-    print("extracting the id: ", video_id)
     result = {}
     # make API call to get video and channel information
     try:
