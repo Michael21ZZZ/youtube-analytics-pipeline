@@ -2,10 +2,20 @@
 
 ## Introduction
 
+### Background
+
+YouTube hosts millions of healthcare related videos on the pathogenesis, diagnosis, treatment, and prevention of a variety of medical conditions [1]. This plethora of user-generated content may be mobilized to improve adherence to clinical guidelines and self-care required for management of chronic diseases.  However, the widely differing video content quality raises concerns in the context of patient education. Patients might find themselves troubled by misinformation and disinformation when they use health-related keywords on YouTube and need better tools to filter the videos in the search results. We hypothesize that video features may capture different aspects of information about health-related videos and there may be distinct patterns that differentiate the video clusters. Profiling these patterns may help content creators and end users to identify gaps and challenges in creating videos for the specific purpose of patient education. For example, if the majority of videos available on a health topic of interest to patients have a long duration, studies have shown that patient engagement with the video will be adversely affected, opening an opportunity to produce new videos that are of shorter duration. 
+
+This platform is aimed to collect key features of healthcare-related YouTube videos and explore what features can be used to quickly evaluate a YouTube video before even viewing it. Besides, this platform also includes video classification to help decide whether a video should be recommended to patients. 
+
+### Platform Introduction
+
 This platform is used for YouTube videos. It consists of three parts:
 
 1. Video selection. Search youtube videos based on clinical keywords
-2. Feature extraction. YouTube provides a powerful API, YouTube Data API, to help developers and researchers collect key features on YouTube videos which we categorize as intrinsic and extrinsic features. Intrinsic features can be considered as properties of the video such as its duration, language, and so on that remain static over time. Extrinsic features are exogenous to the video such as the number of views, likes and comments that change over time once the video is published. ![image](https://user-images.githubusercontent.com/91205016/224120047-069ef879-a098-4c6d-bc95-5795bb30f575.png)
+
+
+2. Feature extraction. YouTube provides a powerful API, YouTube Data API, to help developers and researchers collect key features on YouTube videos which we categorize as intrinsic and extrinsic features. Intrinsic features can be considered as properties of the video such as its duration, language, and so on that remain static over time. Extrinsic features are exogenous to the video such as the number of views, likes and comments that change over time once the video is published.
 
 3. Classification. Train a model to classifiy videos based on high/low understandability and high/low medical information.
 
