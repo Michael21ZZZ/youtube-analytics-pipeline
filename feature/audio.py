@@ -34,7 +34,8 @@ def transcribe_gcs(gcs_uri):
     operation = client.long_running_recognize(config=config, audio=audio)
 
     # print("Waiting for operation to complete...")
-    response = operation.result(timeout=180) # timeout
+    # 180 is not enough...
+    response = operation.result(timeout=600) # timeout
     
     # Each result is for a consecutive portion of the audio. Iterate through
     # them to get the transcripts for the entire audio file.
