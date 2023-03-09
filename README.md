@@ -5,7 +5,8 @@
 This platform is used for YouTube videos. It consists of three parts:
 
 1. Video selection. Search youtube videos based on clinical keywords
-2. Feature extraction. Extract features(video metadata).
+2. Feature extraction. YouTube provides a powerful API, YouTube Data API, to help developers and researchers collect key features on YouTube videos which we categorize as intrinsic and extrinsic features. Intrinsic features can be considered as properties of the video such as its duration, language, and so on that remain static over time. Extrinsic features are exogenous to the video such as the number of views, likes and comments that change over time once the video is published. ![image](https://user-images.githubusercontent.com/91205016/224120047-069ef879-a098-4c6d-bc95-5795bb30f575.png)
+
 3. Classification. Train a model to classifiy videos based on high/low understandability and high/low medical information.
 
 The overall data pipeline is shown as follows:
