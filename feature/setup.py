@@ -12,19 +12,55 @@ import argparse
 import pprint
 from pytube import YouTube
 import pandas as pd
+import pickle
 from google.cloud import storage
 import os
 import argparse
 import pprint
+from googleapiclient.discovery import build
+from google_auth_oauthlib.flow import InstalledAppFlow
+from google.auth.transport.requests import Request
 
-class SetupError(Exception):
+class DownloadError(Exception):
+    def __init__(self, message):
+        self.message = message
+
+class AuthenticateError(Exception):
     def __init__(self, message):
         self.message = message
         
+def youtube_authenticate(client_secrets_file):
+    try: 
+        SCOPES = ["https://www.googleapis.com/auth/youtube.force-ssl"]
+        os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
+        api_service_name = "youtube"
+        api_version = "v3"
+        creds = None
+        # the file token.pickle stores the user's access and refresh tokens, and is
+        # created automatically when the authorization flow completes for the first time
+        if os.path.exists("token.pickle"):
+            with open("token.pickle", "rb") as token:
+                creds = pickle.load(token)
+        # if there are no (valid) credentials availablle, let the user log in.
+        if not creds or not creds.valid:
+            if creds and creds.expired and creds.refresh_token:
+                creds.refresh(Request())
+            else:
+                flow = InstalledAppFlow.from_client_secrets_file(client_secrets_file, SCOPES)
+                creds = flow.run_local_server(port=0)
+            # save the credentials for the next run
+            with open("token.pickle", "wb") as token:
+                pickle.dump(creds, token)
+
+        return build(api_service_name, api_version, credentials=creds)
+    
+    except:
+        raise AuthenticateError("Authentication Fails.")
+
 def download_video_by_id(video_id, save_path):
     video_url = 'https://www.youtube.com/watch?v=' + video_id
     file_name = str(video_id) + '.mp4'
-    print("Downloading:", video_url)
+    #print("Downloading:", video_url)
     try: 
         # object creation using YouTube which was imported in the beginning 
         yt = YouTube(video_url) 
@@ -143,7 +179,8 @@ def bucket_metadata(bucket_name):
     print("Labels:")
     pprint.pprint(bucket.labels)
 
-def pipeline_setup(video_id):
+# download the video, separate the audio, upload to gcp
+def download(video_id):
     # pipeline set up
     local_video_path = os.path.join(os.environ.get("LOCAL_VIDEO_ROOT_PATH"), video_id +".mp4")
     local_audio_path = os.path.join(os.environ.get("LOCAL_AUDIO_ROOT_PATH"), video_id +".wav")
@@ -169,7 +206,8 @@ def pipeline_setup(video_id):
         upload_blob(os.environ.get("AUDIO_BUCKET_NAME"), local_audio_path, video_id +".wav")
     
     except:
-        raise SetupError('HAVING TROBULE SETTING UP PIPELINE FOR: '+video_id)
+        raise DownloadError('HAVING TROBULE DOWNLOADING VIDEOS FOR: '+video_id)
+
 
 if __name__ == 'main':
     extract_single_audio("temp/KLoaYPXlWHM.mp4", "temp")

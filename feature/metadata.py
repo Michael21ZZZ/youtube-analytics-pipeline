@@ -21,32 +21,12 @@ import pandas as pd
 from bs4 import BeautifulSoup as bs
 from requests_html import HTMLSession
 from datetime import datetime
+from feature.setup import *
 
-
-def youtube_authenticate(client_secrets_file):
-    SCOPES = ["https://www.googleapis.com/auth/youtube.force-ssl"]
-    os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
-    api_service_name = "youtube"
-    api_version = "v3"
-    creds = None
-    # the file token.pickle stores the user's access and refresh tokens, and is
-    # created automatically when the authorization flow completes for the first time
-    if os.path.exists("token.pickle"):
-        with open("token.pickle", "rb") as token:
-            creds = pickle.load(token)
-    # if there are no (valid) credentials availablle, let the user log in.
-    if not creds or not creds.valid:
-        if creds and creds.expired and creds.refresh_token:
-            creds.refresh(Request())
-        else:
-            flow = InstalledAppFlow.from_client_secrets_file(client_secrets_file, SCOPES)
-            creds = flow.run_local_server(port=0)
-        # save the credentials for the next run
-        with open("token.pickle", "wb") as token:
-            pickle.dump(creds, token)
-
-    return build(api_service_name, api_version, credentials=creds)
-
+class MetadataError(Exception):
+    def __init__(self, message):
+        self.message = message
+        
 def get_video_id_by_url(url):
     """
     Return the Video ID from the video `url`
@@ -145,7 +125,7 @@ def extract_comments(youtube, **kwargs):
     return len(comments_list)
 
 #get accreditation tag from a single video id
-def get_accreditation_tag(videoID, channel_id):
+def get_accreditation_tag(videoID, channel_id, acc_channel_list, no_acc_channel_list):
     try:
         search_url = "https://www.youtube.com/watch?v="
         video_url = search_url + videoID
@@ -176,102 +156,94 @@ def get_accreditation_tag(videoID, channel_id):
 
     return acc_tag
 
-def metadata_extraction(youtube, video_id):
-    result = {}
-    # make API call to get video and channel information
-    try:
-        video_response = get_video_details(youtube, id=video_id)
-        items = video_response.get("items")[0]
-        snippet = items["snippet"]
-        video_statistics = items["statistics"]
-        content_details = items["contentDetails"]
-        channel_id = snippet["channelId"]
-        channel_response = get_channel_details(youtube, id=channel_id)   
-    except:
-        print("Failed to extract the videos! The video id is: ", video_id)
-        return
-    channel_statistics = channel_response["items"][0]["statistics"]
-    duration = isodate.parse_duration(content_details["duration"]).total_seconds()
-    description = snippet["description"].replace('\n', ' ') #remove new line
+def metadata_features(youtube, video_id):
+    try: 
+        result = {}
+        acc_channel_list = []
+        no_acc_channel_list = []
+        # make API call to get video and channel information
+        try:
+            video_response = get_video_details(youtube, id=video_id)
+            items = video_response.get("items")[0]
+            snippet = items["snippet"]
+            video_statistics = items["statistics"]
+            content_details = items["contentDetails"]
+            channel_id = snippet["channelId"]
+            channel_response = get_channel_details(youtube, id=channel_id)   
+        except:
+            print("Failed to extract the videos! The video id is: ", video_id)
+            return
+        
+        channel_statistics = channel_response["items"][0]["statistics"]
+        duration = isodate.parse_duration(content_details["duration"]).total_seconds()
+        description = snippet["description"].replace('\n', ' ') #remove new line
 
-    # restore video metadata information
-    # id, string
-    result["id"] = items["id"]
-    # title, string
-    result["title"] = snippet["title"]
-    # hasTags, 0/1
-    try:
-        result["hasTags"] =  1 if len(snippet["tags"]) != 0 else 0
-    except:
-        result["hasTags"] = 0
-    # num_of_tags, integer
-    try:
-        result["num_of_tags"] = len(snippet['tags'])
-    except:
-        result["num_of_tags"] = 0
-    # tags, string
-    try:
-        result["tags"] = snippet['tags'].join('')
-    except:
-        result["tags"] = ''
-    # hasDescription, 0/1
-    result["hasDescription"] = 1 if len(description) != 0 else 0 #remove new line
-    # channel_subscribers, integer
-    result["channel_subscribers"] = channel_statistics["subscriberCount"]
-    # accreditationTag, 0/1
-    result["accreditationTag"] = get_accreditation_tag(video_id, channel_id)
-    # duration, integer
-    result["duration"] = duration
-    # description, text
-    result["description"] = description
-    # publish_days, integer
-    current_date = '2023-02-15'
-    result['publish_days'] = (datetime.strptime(current_date, "%Y-%m-%d") - datetime.strptime(snippet["publishedAt"][0:10], "%Y-%m-%d")).days
-    # hasThumbnail, 0/1, TODO
-    # result["hasThumbnail"] = 1
-    # thumbnails = video_response['items'][0]['snippet']['thumbnails']
-    # result['thumbnails'] = thumbnails
-    # result["views"] = video_statistics["viewCount"]
-    # result["date_published"] = snippet["publishedAt"][0:10]
-    # try: 
-    #     result["comments"]= extract_comments(youtube, part="snippet, replies", videoId = video_id, textFormat='plainText')
-    # except:
-    #     result["comments"]= 0
-    # try:
-    #     result["likes"] = video_statistics["likeCount"]
-    # except:
-    #     result["likes"] = 0
-    # result["channel_name"] = snippet["channelTitle"]
-    # result["chanenelID"] = snippet["channelId"]
-    # result["channel_subscribers"] = channel_statistics["subscriberCount"]
-    # result["accreditationTag"] = get_accreditation_tag(video_id, channel_id)
-    # result["duration"] = duration
-    # result["keyword"] = keyword
-    # result["rank"] = rank
-    # result["consine similarity"] = calc_cosine_similarity(str(keyword), result["description"])
+        # restore video metadata information
+        # id, string
+        # result["id"] = items["id"]
+        # title, string
+        result["title"] = snippet["title"]
+        # hasTags, 0/1
+        try:
+            result["hasTags"] =  1 if len(snippet["tags"]) != 0 else 0
+        except:
+            result["hasTags"] = 0
+        # num_of_tags, integer
+        try:
+            result["num_of_tags"] = len(snippet['tags'])
+        except:
+            result["num_of_tags"] = 0
+        # tags, string
+        try:
+            result["tags"] = snippet['tags'].join('')
+        except:
+            result["tags"] = ''
+        # hasDescription, 0/1
+        result["hasDescription"] = 1 if len(description) != 0 else 0 #remove new line
+        # channel_subscribers, integer
+        result["channel_subscribers"] = channel_statistics["subscriberCount"]
+        # accreditationTag, 0/1
+        result["accreditationTag"] = get_accreditation_tag(video_id, channel_id, acc_channel_list, no_acc_channel_list)
+        # duration, integer
+        result["duration"] = duration
+        # description, text
+        result["description"] = description
+        # publish_days, integer
+        current_date = '2023-02-15'
+        result['publish_days'] = (datetime.strptime(current_date, "%Y-%m-%d") - datetime.strptime(snippet["publishedAt"][0:10], "%Y-%m-%d")).days
+        # hasThumbnail, 0/1, TODO
+        # result["hasThumbnail"] = 1
+        # thumbnails = video_response['items'][0]['snippet']['thumbnails']
+        # result['thumbnails'] = thumbnails
+        # result["views"] = video_statistics["viewCount"]
+        # result["date_published"] = snippet["publishedAt"][0:10]
+        # try: 
+        #     result["comments"]= extract_comments(youtube, part="snippet, replies", videoId = video_id, textFormat='plainText')
+        # except:
+        #     result["comments"]= 0
+        # try:
+        #     result["likes"] = video_statistics["likeCount"]
+        # except:
+        #     result["likes"] = 0
+        # result["channel_name"] = snippet["channelTitle"]
+        # result["chanenelID"] = snippet["channelId"]
+        # result["channel_subscribers"] = channel_statistics["subscriberCount"]
+        # result["accreditationTag"] = get_accreditation_tag(video_id, channel_id)
+        # result["duration"] = duration
+        # result["keyword"] = keyword
+        # result["rank"] = rank
+        # result["consine similarity"] = calc_cosine_similarity(str(keyword), result["description"])
 
-    return result
+        return result
+    
+    except:
+        raise MetadataError('Having trouble with metadata')
 
 
 if __name__ == '__main__':
-    youtube = youtube_authenticate(os.getenv('OAUTH_CREDENTIAL'))
-    videoIDs = pd.read_csv('./temp/sampled_filtered_video_list.csv')
-    m = open('./temp/metadata_feature.json','w')
-    t = open('./temp/text_result.json','w')
-    for i in range(videoIDs.shape[0]):
-        keyword = videoIDs.loc[i, 'keyword']
-        video_id = videoIDs.loc[i, 'id']
-        # rank = int(videoIDs.loc[i, 'rank'])
-        metadata, text_feature = metadata_extraction(youtube, video_id, keyword)
-        m.write(json.dumps(metadata))
-        m.write('\n')
-        t.write(json.dumps(text_feature))
-        t.write('\n')
-        # break
-    m.close()
-    t.close()
-    # print(acc_channel_list)
-    # print(noacc_channel_list)
+    youtube = youtube_authenticate(os.environ.get("OAUTH_CREDENTIAL_PATH"))
+    metadata = metadata_features('elJuUGruxOU', youtube)
+    print(metadata)
 
 
 

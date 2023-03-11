@@ -30,37 +30,9 @@ TRANSITION_WORD_LIST = ['Accordingly', ' as a result', ' and so', ' because', ' 
                         'likewise', ' in like manner', ' i.e.', ' in other word', ' that is', ' to clarify', ' to explain', ' in fact', ' of course', ' undoubtedly', ' without doubt', ' surely', ' indeed', ' for this purpose', ' so that', ' to this end', ' in order that', ' to that end']
 
 
-# function calculating the similarity of keyword with video description
-# def calc_cosine_similarity(word1, word2):
-#     # Cosine similarity calculation
-#     # tokenization
-#     X_list = word_tokenize(word1) 
-#     Y_list = word_tokenize(word2)
-      
-#     # sw contains the list of stopwords
-#     sw = stopwords.words('english') 
-#     l1 =[];l2 =[]
-      
-#     # remove stop words from the string
-#     X_set = {w for w in X_list if not w in sw} 
-#     Y_set = {w for w in Y_list if not w in sw}
-      
-#     # form a set containing keywords of both strings 
-#     rvector = X_set.union(Y_set) 
-#     for w in rvector:
-#         if w in X_set: l1.append(1) # create a vector
-#         else: l1.append(0)
-#         if w in Y_set: l2.append(1)
-#         else: l2.append(0)
-#     c = 0
-      
-#     # cosine formula 
-#     for i in range(len(rvector)):
-#         c+= l1[i]*l2[i]
-#     if float((sum(l1)*sum(l2))**0.5) == 0:
-#         return "NA"
-#     else:
-#         return c / float((sum(l1)*sum(l2))**0.5)
+class NLPError(Exception):
+    def __init__(self, message):
+        self.message = message
 
 def calculate_cosine_similarity(text1, text2):
     # Initialize the vectorizer and transform the texts to vectors
@@ -74,10 +46,13 @@ def calculate_cosine_similarity(text1, text2):
 
 # count number of medical entity in given texts
 def medical_entity_count(text):
-    nlp = spacy.load("en_ner_bc5cdr_md")
-    doc = nlp(text)
-    clinical_terms = set([ent.text.lower() for ent in doc.ents if ent.label_ in ['DISEASE', 'CHEMICAL']])
-    return len(clinical_terms)
+    if len(text) == 0:
+        return 0
+    else:
+        nlp = spacy.load("en_ner_bc5cdr_md")
+        doc = nlp(text)
+        clinical_terms = set([ent.text.lower() for ent in doc.ents if ent.label_ in ['DISEASE', 'CHEMICAL']])
+        return len(clinical_terms)
 
 # count basic statistics of the text
 def count_stats(paragraph):
@@ -128,3 +103,35 @@ def count_stats(paragraph):
 
     return words, unique_words, sentences, active_words, summary_words, transition_words, ari_score
 
+def desc_nlp_feature(description):
+    try: 
+        # print("EXTRACTING NLP DESCRIPTION FEATURES!")
+        # nlp feature
+        nlp = {}
+        # syntatic features of desccription and transcription
+        nlp['desc_words'],nlp['desc_uni'],nlp['desc_sen'],nlp['desc_act'], nlp['desc_sum'], nlp['desc_trans'], nlp['desc_ari'] = count_stats(description)
+        # mer features of description and transcription
+        nlp['desc_mer'] = medical_entity_count(description)
+        
+        return nlp
+    
+    except:
+        raise NLPError('HAVING TROBULE WITH NLP FEATURES for DESCRIPTION: ')
+
+def trans_nlp_feature(transcription):
+    try: 
+        # print("EXTRACTING NLP TRANSCRIPTION FEATURES!")
+        # nlp feature
+        nlp = {}
+        nlp['tran_words'],nlp['tran_uni'],nlp['tran_sen'],nlp['tran_act'], nlp['tran_sum'], nlp['tran_trans'], nlp['tran_ari'] = count_stats(transcription)
+        # mer features of description and transcription
+        nlp['tran_mer'] = medical_entity_count(transcription)
+        # cosine similarity feature
+        # nlp['cos_desc'] = calculate_cosine_similarity(keyword, metadata['description'])
+        # nlp['cos_trans'] = calculate_cosine_similarity(keyword, audio['transcription'])
+        # nlp['cos_title'] = calculate_cosine_similarity(keyword, metadata['title'] + metadata['tags'])
+        
+        return nlp
+    
+    except:
+        raise NLPError('HAVING TROBULE WITH NLP FEATURES FOR TRANSCRIPTION')

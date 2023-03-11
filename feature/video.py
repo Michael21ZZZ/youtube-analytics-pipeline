@@ -58,11 +58,14 @@ def text_detection(path):
         text_segment = text_annotation.segments[0]
         confidence += text_segment.confidence
     
-    return confidence / num_of_texts
+    if num_of_texts == 0:
+        return 0
+    else:
+        return confidence / num_of_texts
         
 def analyze_by_path(path):
     dict_video = {}
-    dict_video['id'] = os.path.basename(path).split(".")[0]
+    # dict_video['id'] = os.path.basename(path).split(".")[0]
     dict_video['num_of_shots'] = analyze_shots(path)
     dict_video['num_of_objects'] = analyze_objects(path)
     dict_video['text_confidence'] = text_detection(path)
