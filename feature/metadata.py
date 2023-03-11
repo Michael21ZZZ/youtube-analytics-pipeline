@@ -134,7 +134,7 @@ def get_accreditation_tag(videoID, channel_id, acc_channel_list, no_acc_channel_
         if (channel_id in acc_channel_list):
             return 1
         #if the video belongs to a non-verified channel, return 0
-        if (channel_id in noacc_channel_list):
+        if (channel_id in no_acc_channel_list):
             return 0
         # init an HTML Session
         session = HTMLSession()
@@ -149,7 +149,7 @@ def get_accreditation_tag(videoID, channel_id, acc_channel_list, no_acc_channel_
             acc_channel_list.append(channel_id)
         else:
             acc_tag = 0
-            noacc_channel_list.append(channel_id)
+            no_acc_channel_list.append(channel_id)
     except:
         # print('error in extracting accTag')
         acc_tag = 0
