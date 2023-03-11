@@ -139,19 +139,22 @@ def stop_callback(process_index):
     
 # Define a function to download features for multiple videos in parallel
 def extract_features_parallel(video_ids):
+    num_processes = 4
     # Use multiprocessing to extract features in parallel
-    with multiprocessing.Pool(processes=8, initializer=start_callback, initargs=([i for i in range(8)],)) as pool:
+    with multiprocessing.Pool(processes=num_processes, initializer=start_callback, initargs=([i for i in range(num_processes)],)) as pool:
         pool.map(extract_features, video_ids, chunksize=10)
         pool.close()
         pool.join()
-        stop_callback([i for i in range(8)])
+        stop_callback([i for i in range(num_processes)])
 
 if __name__ == '__main__':
     # Load environment variables from the .env file
-    load_dotenv("amia.env", override=True)
+    load_dotenv("ytbvideoanalytics2022.env", override=True)
     os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = os.path.join(os.getcwd(), os.environ.get("SERVICE_ACCOUNT_PATH"))
     # load the covid dataset
     colon = pd.read_csv("input/Yawen-Colonoscopy-Covid Data files/colonoscopy/complete_colonoscopy_classification_set.csv")
     colon_list = colon['id'].values.tolist()
-    extract_features_parallel(colon_list)
+    extracted_keys = [item.decode('utf-8') for item in redis_client.scan(match='*', count=1000)[1]]
+    unextracted_keys = [item for item in colon_list if item not in extracted_keys]
+    extract_features_parallel(unextracted_keys)
 
