@@ -19,6 +19,7 @@ import json
 from cleantext import clean
 import pandas as pd
 from bs4 import BeautifulSoup as bs
+import requests
 from requests_html import HTMLSession
 from datetime import datetime
 from feature.setup import *
@@ -125,33 +126,17 @@ def extract_comments(youtube, **kwargs):
     return len(comments_list)
 
 #get accreditation tag from a single video id
-def get_accreditation_tag(videoID, channel_id, acc_channel_list, no_acc_channel_list):
+def get_acc_tag(videoID):
     try:
         search_url = "https://www.youtube.com/watch?v="
         video_url = search_url + videoID
-        # print("Retrieving accTag for: ", video_url)
-        #if the video belongs to a verified channel, return 1
-        if (channel_id in acc_channel_list):
-            return 1
-        #if the video belongs to a non-verified channel, return 0
-        if (channel_id in no_acc_channel_list):
-            return 0
-        # init an HTML Session
-        session = HTMLSession()
-        # get the html content
-        response = session.get(video_url)
-        response.html.render(scrolldown = 4, sleep=1, timeout=60)
-        # create bs object to parse HTML
-        soup = bs(response.html.html, "html.parser")
-        acc_tag_text = soup.find_all("div", {"class":"content style-scope ytd-info-panel-content-renderer"})
-        if(len(acc_tag_text) > 0):
+        response = requests.get(video_url)
+        if "From an accredited hospital" in response.text:
             acc_tag = 1
-            acc_channel_list.append(channel_id)
         else:
             acc_tag = 0
-            no_acc_channel_list.append(channel_id)
     except:
-        # print('error in extracting accTag')
+        print('error in extracting accTag')
         acc_tag = 0
 
     return acc_tag
@@ -203,7 +188,7 @@ def metadata_features(youtube, video_id):
         # channel_subscribers, integer
         result["channel_subscribers"] = channel_statistics["subscriberCount"]
         # accreditationTag, 0/1
-        result["accreditationTag"] = get_accreditation_tag(video_id, channel_id, acc_channel_list, no_acc_channel_list)
+        result["accreditationTag"] = get_acc_tag(video_id)
         # duration, integer
         result["duration"] = duration
         # description, text
